@@ -6,18 +6,320 @@
 
 package examen2;
 
+//Importar todas las librerias a utilizar
+import javax.swing.JFrame;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.Toolkit;
+import java.awt.Color;
+import java.util.LinkedList;
+
 /**
  *
  * @author Cesar Rodriguez, Angela Romo
  * A01036009, A01139764
  */
-public class Examen2 {
+public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListener {
+    
+    // Declarar todas las variables
+    private Color c;
+    private long tiempoActual; //Variables de control de tiempo de la animacion
+    private long tiempoInicial; //Variables de control de tiempo de la animacion
+    private boolean pausa; // bandera para manejar la pausa
+    //banderas para activar o no sonido y musica
+    private boolean sonido;
+    private boolean musica;
+    private Image dbImage;// Imagen a proyectar	
+    private Graphics dbg; // Objeto grafico
+    private int numBloques; //numero de bloques de meth
+    private Image fondo; //fondo del juego
+    private int score; //puntaje
+    private int vidas; //vidas del juego
+    //sonidos
+    private SoundClip tap;
+    private SoundClip choca;
+    private SoundClip musicaFondo;
+     //imagenes pantallas
+    private Image pantallaInstrucciones;
+    private Image pantallaAjustes;
+    private Image pantallaGameOver;
+    private Image pantallaGoodJob;
+    private Image pantallaCreditos;
+    private Image pantallaPausa;
+    private Image pantallaInicio;
+    private LinkedList list; //lista para barreras
+    //booleanos
+    private boolean Menu;
+    private boolean Creditos;
+    private boolean Instrucciones;
+    private boolean juegoInicia;
+    private boolean gameOver;
+
+    
+    public Examen2() {
+        setTitle("JFrame Breaking Blocks");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(200, 200);
+        this.setSize(600, 800); //tamaño del jframe
+        score = 0; //el score inicia en 0
+        vidas = 1; //solo hay 1 vida en el juego
+        //booleanos de audio
+        sonido = true;
+        musica = true;
+        addMouseListener(this);
+        addKeyListener(this);
+        c = new Color(255, 255, 255); //para el string de vidas 
+        //crea lista para barreras
+        list = new LinkedList();
+        //Imagenes
+        fondo = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("fondo/fondo2soft.jpg"));
+        pantallaInstrucciones = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaInstrucciones.jpg"));
+        pantallaPausa = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaPausa.jpg"));
+        pantallaCreditos = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaCreditos.jpg"));
+        //pantallaAjustes = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaAjustes.jpg"));
+        pantallaGameOver = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaGameOver.jpg"));
+        pantallaInicio = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaInicio.jpg"));
+        //booleanos para control de pantallas
+        //inicializar variables booleanas 
+        Menu = true;
+        Creditos = false;
+        Instrucciones = false;
+        gameOver = false;
+        juegoInicia = false;
+        
+        
+        //HILO
+        Thread th = new Thread(this);
+        // Empieza el hilo
+        th.start();
+    }
+    
+    /**
+     * Metodo <I>run</I> sobrescrito de la clase <code>Thread</code>.<P>
+     * En este metodo se ejecuta el hilo, es un ciclo indefinido donde se
+     * incrementa la posicion en x o y dependiendo de la direccion, finalmente
+     * se repinta el <code>JFrame</code> y luego manda a dormir el hilo.
+     *
+     */
+    public void run() {
+
+        //Guarda el tiempo actual del sistema
+        tiempoActual = System.currentTimeMillis();
+
+        //Ciclo principal del JFrame. Actualiza y despliega en pantalla hasta que se acaben las vidas
+        while (vidas > 0) {
+
+            //si esta pausado no actualizas ni checas colision 
+            if (!pausa) {
+                actualiza();
+                checaColision();
+            }
+            repaint(); // Se actualiza el <code>JFrame</code> repintando el contenido.
+            try {
+                // El thread se duerme.
+                Thread.sleep(80);
+            } catch (InterruptedException ex) {
+                System.out.println("Error en " + ex.toString());
+            }
+
+        }
+    }
+    
+      /**
+     * Metodo <I>actualiza</I>
+     * Es usado para actualizar la posicion de los personajes y los valores de
+     * las variables.
+     */
+    public void actualiza() { 
+    
+    }
+
+    
+    /**
+     * Metodo <I>checaColision</I>
+     * Metodo usado para checar las colisiones de los objetos barquito y rayito
+     * entre sí y con las orillas del <code>JFrame</code>.
+     */
+    public void checaColision() {
+    
+    }
+    
+    
+    /**
+     * Metodo <I>paint</I>
+     * En este metodo lo que hace es actualizar el contenedor (Update)
+     *
+     * @param g es el <code>objeto grafico</code> usado para dibujar.
+     */
+    public void paint(Graphics g) {
+         // Inicializan el DoubleBuffer
+        if (dbImage == null) {
+            dbImage = createImage(this.getSize().width, this.getSize().height);
+            dbg = dbImage.getGraphics();
+        }
+
+        // Actualiza la imagen de fondo.
+        dbg.setColor(getBackground());
+        dbg.fillRect(0, 0, this.getSize().width, this.getSize().height);
+
+        // Actualiza el Foreground.
+        dbg.setColor(getForeground());
+        paint1(dbg);
+
+        // Dibuja la imagen actualizada
+        g.drawImage(dbImage, 0, 0, this);
+
+    }
+    
+    
+    /**
+     * Metodo <I>paint1</I>
+     * En este metodo se dibuja la imagen con la posicion actualizada, ademas
+     * que cuando la imagen es cargada te despliega una advertencia. (Paint)
+     *
+     * @param g es el <code>objeto grafico</code> usado para dibujar.
+     */
+    public void paint1(Graphics g) {
+    
+    }
+    
+   /**
+     * Metodo <I>keyTyped</I> sobrescrito de la interface
+     * <code>KeyListener</code>.<P>
+     * En este metodo maneja el evento que se genera al presionar una tecla que
+     * no es de accion.
+     *
+     * @param e es el <code>evento</code> que se genera en al presionar las
+     * teclas.
+     */
+    public void keyTyped(KeyEvent e) {
+    }
 
     /**
-     * @param args the command line arguments
+     * Metodo <I>keyPressed</I> sobrescrito de la interface
+     * <code>KeyListener</code>.<P>
+     * En este metodo maneja el evento que se genera al presionar cualquier la
+     * tecla.
+     *
+     * @param e es el <code>evento</code> generado al presionar las teclas.
      */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_P) {    //Presiono letra P
+            pausa = !pausa; //cambio valor de pausa
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_S) { //Presiono tecla S
+            sonido = !sonido;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_M) { //Presiono tecla M
+            musica = !musica;
+        } 
     }
+
+    /**
+     * Metodo <I>keyReleased</I> sobrescrito de la interface
+     * <code>KeyListener</code>.<P>
+     * En este metodo maneja el evento que se genera al soltar la tecla
+     * presionada.
+     *
+     * @param e es el <code>evento</code> que se genera en al soltar las teclas.
+     */
+    public void keyReleased(KeyEvent e) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+    }
+
+    /**
+     * Metodo mouseClicked sobrescrito de la interface MouseListener. En este
+     * metodo maneja el evento que se genera al hacer click con el mouse sobre
+     * algun componente. e es el evento generado al hacer click con el mouse.
+     */
+    public void mouseClicked(MouseEvent e) {
+      /*  clickX = e.getX();
+        clickY = e.getY();
+
+        //checa clicks en botones
+        if (botonInst.clickEnPersonaje(clickX, clickY)) {
+            if (!juegoInicia) {
+                Menu = false;
+                Instrucciones = true;
+            }
+        }
+        if (botonIni.clickEnPersonaje(clickX, clickY)) {
+            pausa = false;
+            Menu = false;
+            juegoInicia = true;
+        }
+        if (botonAj.clickEnPersonaje(clickX, clickY)) {
+            if (!juegoInicia) {
+                Menu = false;
+                Ajustes = true;
+            }
+        }
+        if (botonCre.clickEnPersonaje(clickX, clickY)) {
+            if (!juegoInicia) {
+                Menu = false;
+                Creditos = true;
+            }
+        }
+        if (botonBack.clickEnPersonaje(clickX, clickY)) {
+            if (vidas==0 || gano) 
+            {
+                vidas=1;
+                gano = false;
+                reset();
+            }
+            Menu = true;
+            Instrucciones = false;
+            Ajustes = false;
+            Creditos = false;
+            juegoInicia=false;
+            
+            
+        }
+*/
+    } 
+
+    /**
+     * Metodo mousePressed sobrescrito de la interface MouseListener. En este
+     * metodo maneja el evento que se genera al presionar un botón del mouse
+     * sobre algun componente. e es el evento generado al presionar un botón del
+     * mouse sobre algun componente.
+     */
+    public void mousePressed(MouseEvent e) {
+    }
+
+    /**
+     * Metodo mouseReleased sobrescrito de la interface MouseListener. En este
+     * metodo maneja el evento que se genera al soltar un botón del mouse sobre
+     * algun componente. e es el evento generado al soltar un botón del mouse
+     * sobre algun componente.
+     */
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    /**
+     * Metodo mouseEntered sobrescrito de la interface MouseListener. En este
+     * metodo maneja el evento que se genera cuando el mouse entra en algun
+     * componente. e es el evento generado cuando el mouse entra en algun
+     * componente.
+     */
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    /**
+     * Metodo mouseExited sobrescrito de la interface MouseListener. En este
+     * metodo maneja el evento que se genera cuando el mouse sale de algun
+     * componente. e es el evento generado cuando el mouse sale de algun
+     * componente.
+     */
+    public void mouseExited(MouseEvent e) {
+    }
+
     
 }
