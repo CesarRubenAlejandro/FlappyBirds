@@ -20,8 +20,8 @@ import java.util.LinkedList;
 
 /**
  *
- * @author Cesar Rodriguez, Angela Romo
- * A01036009, A01139764
+ * @author Cesar Rodriguez A01036009, Angela Romo A01139764
+ * 
  */
 public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListener {
     
