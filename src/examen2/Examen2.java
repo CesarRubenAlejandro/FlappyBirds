@@ -58,6 +58,12 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     private boolean Instrucciones;
     private boolean juegoInicia;
     private boolean gameOver;
+    
+    private boolean vuela;
+    private Pikachu pika;
+    private int tiempo;
+    private int grav;
+    private boolean pegaAbajo;
 
     
     public Examen2() {
@@ -68,34 +74,47 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         score = 0; //el score inicia en 0
         vidas = 1; //solo hay 1 vida en el juego
         //booleanos de audio
-        sonido = true;
-        musica = true;
+       // sonido = true;
+       // musica = true;
         addMouseListener(this);
         addKeyListener(this);
         c = new Color(255, 255, 255); //para el string de vidas 
         //crea lista para barreras
-        list = new LinkedList();
+        //list = new LinkedList();
         //Imagenes
         fondo = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("fondo/fondo2soft.jpg"));
-        pantallaInstrucciones = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaInstrucciones.jpg"));
-        pantallaPausa = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaPausa.jpg"));
-        pantallaCreditos = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaCreditos.jpg"));
+       // pantallaInstrucciones = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaInstrucciones.jpg"));
+     //   pantallaPausa = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaPausa.jpg"));
+      //  pantallaCreditos = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaCreditos.jpg"));
         //pantallaAjustes = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaAjustes.jpg"));
-        pantallaGameOver = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaGameOver.jpg"));
-        pantallaInicio = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaInicio.jpg"));
+       // pantallaGameOver = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaGameOver.jpg"));
+      //  pantallaInicio = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaInicio.jpg"));
         //booleanos para control de pantallas
         //inicializar variables booleanas 
-        Menu = true;
+       // Menu = true;
         Creditos = false;
         Instrucciones = false;
         gameOver = false;
         juegoInicia = false;
         
+        vuela = false;
+        pika = new Pikachu(getWidth()/4, getHeight()/4);
+        tiempo = 0;
+        grav = 2;
+        pegaAbajo = false;
         
         //HILO
         Thread th = new Thread(this);
         // Empieza el hilo
         th.start();
+    }
+    
+    public void reset(){
+        vidas = 1;
+        tiempo = 0;
+        vuela = false;
+        pika.setPosY(getHeight()/4);
+        pika.setPosX(getWidth()/4);
     }
     
     /**
@@ -135,7 +154,32 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * las variables.
      */
     public void actualiza() { 
-    
+        
+        if (pegaAbajo){
+            reset();
+            pegaAbajo = false;
+        }
+        //Determina el tiempo que ha transcurrido desde que el Applet inicio su ejecuciÃ³n
+        long tiempoTranscurrido = System.currentTimeMillis() - tiempoActual;
+        //Guarda el tiempo actual
+        tiempoActual += tiempoTranscurrido;
+        
+        // Aumenta el tiempo para la formula fisica
+        tiempo++;
+        //Actualiza los gifs
+        pika.actualiza(tiempoActual);
+        // Si presionas SPACEBAR reinicias el tiempo y le das una velocidad inicial al pikachu
+        if (vuela){
+            tiempo = 0;
+            pika.setVelocidad(8);
+        }
+        
+        // 
+        int aux = (pika.getVelocidad()*tiempo) - (grav*tiempo*tiempo)/2;
+        pika.setPosY(  pika.getPosY() - aux );
+        
+        //reinicia bools
+        vuela = false;
     }
 
     
@@ -145,7 +189,9 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * entre sí y con las orillas del <code>JFrame</code>.
      */
     public void checaColision() {
-    
+        if (pika.getPosY()>getWidth()){
+            pegaAbajo = true;
+        }
     }
     
     
@@ -184,7 +230,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * @param g es el <code>objeto grafico</code> usado para dibujar.
      */
     public void paint1(Graphics g) {
-    
+        g.drawImage(pika.getImagenI(), pika.getPosX(), pika.getPosY(), this);
     }
     
    /**
@@ -218,6 +264,10 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
 
         if (e.getKeyCode() == KeyEvent.VK_M) { //Presiono tecla M
             musica = !musica;
+        } 
+        
+        if (e.getKeyCode() == KeyEvent.VK_SPACE) { //Presiono tecla M
+            vuela = true;
         } 
     }
 
