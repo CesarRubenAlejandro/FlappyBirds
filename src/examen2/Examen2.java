@@ -43,6 +43,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     private int vidas; //vidas del juego
     //sonidos
     private SoundClip tap;
+    private SoundClip punto;
     private SoundClip choca;
     private SoundClip musicaFondo;
     //imagenes pantallas
@@ -113,6 +114,16 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         botonCre.setPosX(getWidth() / 2 - botonCre.getAncho() / 2); //reposicionar
         botonBack = new botonBack(getWidth() / 2, 650);
         botonBack.setPosX(getWidth() / 2 - botonBack.getAncho() / 2); //reposicionar
+        //Sonidos
+        tap = new SoundClip("Sounds/vida.wav");
+        punto = new SoundClip("Sounds/desk_bell.wav");
+        choca = new SoundClip("Sounds/dead.wav");
+        musicaFondo = new SoundClip("Sounds/shorter-swbl.wav");
+        //musica
+        //Activa la repetición del clip
+        musicaFondo.setLooping(true);
+        //Reproduce el clip
+        musicaFondo.play();
         //booleanos para control de pantallas
         Menu = true;
         Creditos = false;
@@ -237,6 +248,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * las variables.
      */
     public void actualiza() throws IOException {
+        
+        if (!sonido) {
+            musicaFondo.stop();
+        }
+        
         if (score == 10 && auxDif1) {
             gap = gap - 80;
             auxDif1 = false;
@@ -249,6 +265,9 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
 
         if (pegaAbajo) {
             vidas--;
+            if(sonido){
+                choca.play();
+            }
             juegoInicia = false;
             pegaAbajo = false;
         }
@@ -266,8 +285,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         if (vuela) {
             tiempo = 0;
             pika.setVelocidad(8);
+            if(sonido){
+                tap.play();
+            }
         }
-
+        
         // Movimiento de caida libre
         int aux = (pika.getVelocidad() * tiempo) - (grav * tiempo * tiempo) / 2;
         pika.setPosY(pika.getPosY() - aux);
@@ -278,6 +300,9 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             ((tubeDown) listDown.get(i)).setPosX(((tubeDown) listDown.get(i)).getPosX() - 10);
             if ((pika.getPosX() > ((tubeUp) listUp.get(i)).getPosX() + ((tubeUp) listUp.get(i)).getAncho()) && (auxScore)) {
                 score++;
+                if(sonido){
+                    punto.play();
+                }
                 auxScore = false;
             }
         }
@@ -437,6 +462,10 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
 
         if (e.getKeyCode() == KeyEvent.VK_S) { //Presiono tecla S
             sonido = !sonido;
+            if (sonido){
+                //Reproduce el clip
+                musicaFondo.play();
+            }
         }
 
         if (e.getKeyCode() == KeyEvent.VK_I) { //Presiono tecla I
@@ -457,7 +486,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             reset();
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_SPACE) { //Presiono tecla M
+        if (e.getKeyCode() == KeyEvent.VK_SPACE) { //Presiono tecla espacio
             vuela = true;
         }
     }
