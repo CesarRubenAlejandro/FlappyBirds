@@ -31,10 +31,8 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     private boolean pausa; // bandera para manejar la pausa
     //banderas para activar o no sonido y musica
     private boolean sonido;
-    private boolean musica;
     private Image dbImage;// Imagen a proyectar	
     private Graphics dbg; // Objeto grafico
-    private int numBloques; //numero de bloques de meth
     private Image fondo; //fondo del juego
     private int score; //puntaje
     private int vidas; //vidas del juego
@@ -44,13 +42,14 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     private SoundClip musicaFondo;
     //imagenes pantallas
     private Image pantallaInstrucciones;
-    private Image pantallaAjustes;
     private Image pantallaGameOver;
-    private Image pantallaGoodJob;
     private Image pantallaCreditos;
-    private Image pantallaPausa;
     private Image pantallaInicio;
-    private LinkedList listUp; //lista para barreras
+    private botonCreditos botonCre;
+    private Image botonSco;
+    private botonBack botonBack;
+    //listas encadenadas para barreras
+    private LinkedList listUp;
     private LinkedList listDown;
     //booleanos
     private boolean Menu;
@@ -58,7 +57,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     private boolean Instrucciones;
     private boolean juegoInicia;
     private boolean gameOver;
-
+    private boolean back;
+    //clicks
+    private int clickX;
+    private int clickY;
+    //pikachu y juego
     private boolean vuela;
     private Pikachu pika;
     private int tiempo;
@@ -78,8 +81,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         score = 0; //el score inicia en 0
         vidas = 1; //solo hay 1 vida en el juego
         //booleanos de audio
-        // sonido = true;
-        // musica = true;
+        sonido = true;
         addMouseListener(this);
         addKeyListener(this);
         c = new Color(255, 255, 255); //para el string de vidas 
@@ -87,21 +89,28 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         listUp = new LinkedList();
         listDown = new LinkedList();
         //Imagenes
-        fondo = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/Slide1.jpg"));
-        // pantallaInstrucciones = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaInstrucciones.jpg"));
-        //   pantallaPausa = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaPausa.jpg"));
-        //  pantallaCreditos = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaCreditos.jpg"));
-        //pantallaAjustes = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaAjustes.jpg"));
-        // pantallaGameOver = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaGameOver.jpg"));
-        //  pantallaInicio = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaInicio.jpg"));
+        fondo = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/Fondo.jpg"));
+        pantallaInstrucciones = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/Instrucciones.jpg"));
+        pantallaCreditos = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/Creditos.jpg"));
+        pantallaGameOver = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/GameOver.jpg"));
+        pantallaInicio = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/Menu.jpg"));
+        botonSco = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Iconos/Scores.png"));
+        botonCre = new botonCreditos(getWidth() / 2, 450);
+        botonCre.setPosX(getWidth() / 2 - botonCre.getAncho() / 2); //reposicionar
+        botonBack = new botonBack(getWidth() / 2, 650);
+        botonBack.setPosX(getWidth() / 2 - botonBack.getAncho() / 2); //reposicionar
         //booleanos para control de pantallas
-        //inicializar variables booleanas 
-        // Menu = true;
+        Menu = true;
         Creditos = false;
         Instrucciones = false;
         gameOver = false;
         juegoInicia = false;
-
+        back = false;
+        gameOver =false;
+        //clicks
+        clickX = 0;
+        clickY = 0;
+        //variables para control del juego
         vuela = false;
         pika = new Pikachu(getWidth() / 4, getHeight() / 4);
         tiempo = 0;
@@ -109,7 +118,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         pegaAbajo = false;
         gap = getHeight() / 3;
         numTubos = 3;
-
+        //crear lista de obstaculos
         int auxPosX = 0;
         for (int i = 0; i < numTubos; i++) {
             int auxPosY = (int) (Math.random() * (600 - 400) + 400);
@@ -121,11 +130,6 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             listDown.add(tubo1);
             auxPosX += getWidth() / 2;
         }
-
-        /* int auxPosY = (int) (Math.random() * (600 - 400) + 400);
-         tubo2 = new tubeUp (getWidth()+20, auxPosY); 
-         tubo1 = new tubeDown (getWidth()+20, -100);
-         tubo1.setPosY(auxPosY-gap - tubo1.getAlto());*/
         auxScore = true;
 
         //HILO
@@ -135,14 +139,21 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     }
 
     public void reset() {
+        juegoInicia = true;
+        //booleanos para control de pantallas
+        Menu=false;
+        Creditos = false;
+        Instrucciones = false;
+        gameOver = false;
+        back = false;
+        gameOver =false;
+        //variables
         vidas = 1;
         tiempo = 0;
         score = 0;
         vuela = false;
         pika.setPosY(getHeight() / 4);
         pika.setPosX(getWidth() / 4);
-        /* tubo1.setPosX(getWidth() + 50);
-         tubo2.setPosX(getWidth() + 50);*/
         int auxPosX = 0;
         for (int i = 0; i < numTubos; i++) {
             int auxPosY = (int) (Math.random() * (600 - 400) + 400);
@@ -153,6 +164,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
 
             auxPosX += getWidth() / 2;
         }
+   
     }
 
     /**
@@ -171,7 +183,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         while (vidas > 0) {
 
             //si esta pausado no actualizas ni checas colision 
-            if (!pausa) {
+            if (!pausa && juegoInicia) {
                 actualiza();
                 checaColision();
             }
@@ -194,9 +206,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     public void actualiza() {
 
         if (pegaAbajo) {
-            reset();
+            vidas--;
+            juegoInicia = false;
             pegaAbajo = false;
         }
+        
         //Determina el tiempo que ha transcurrido desde que el Applet inicio su ejecuciÃ³n
         long tiempoTranscurrido = System.currentTimeMillis() - tiempoActual;
         //Guarda el tiempo actual
@@ -216,10 +230,6 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         int aux = (pika.getVelocidad() * tiempo) - (grav * tiempo * tiempo) / 2;
         pika.setPosY(pika.getPosY() - aux);
 
-        /*if ((pika.getPosX() > tubo1.getPosX() + tubo1.getAncho()) && (auxScore)) {
-         score++;
-         auxScore = false;
-         }*/
         // Movimiento de las tuberias
         for (int i = 0; i < numTubos; i++) {
             ((tubeUp) listUp.get(i)).setPosX(((tubeUp) listUp.get(i)).getPosX() - 10);
@@ -229,11 +239,13 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
                 auxScore = false;
             }
         }
-        /*tubo1.setPosX(tubo1.getPosX() - 10);
-         tubo2.setPosX(tubo2.getPosX() - 10);*/
-
         //reinicia bools
         vuela = false;
+        
+        //checa vidas
+        if(vidas==0){
+            gameOver = true; //prende bool para PANTALLA de gameover
+        }
     }
 
     /**
@@ -255,27 +267,26 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             if ((pika.intersecta(((tubeDown) listDown.get(i)))) || (pika.intersecta(((tubeUp) listUp.get(i))))) {
                 pegaAbajo = true;
             }
-            int auxX = getWidth()/2;
+            int auxX = getWidth() / 2;
             tubeDown tub = (tubeDown) listDown.get(i);
             if (tub.getPosX() + tub.getAncho() < 0) {
-                if (i==0){
-                    ((tubeDown) listDown.get(i)).setPosX(getWidth()  + auxX);
+                if (i == 0) {
+                    ((tubeDown) listDown.get(i)).setPosX(getWidth() + auxX);
                     ((tubeUp) listUp.get(i)).setPosX(getWidth() + auxX);
                     int auxPosY = (int) (Math.random() * (600 - 400) + 400);
                     ((tubeUp) listUp.get(i)).setPosY(auxPosY);
                     ((tubeDown) listDown.get(i)).setPosY(auxPosY - gap - ((tubeUp) listUp.get(i)).getAlto());
 
-                    auxX += getWidth()/2;
+                    auxX += getWidth() / 2;
                     auxScore = true;
-                }
-                else{
+                } else {
                     ((tubeDown) listDown.get(i)).setPosX(getWidth() + 20 + auxX);
                     ((tubeUp) listUp.get(i)).setPosX(getWidth() + 20 + auxX);
                     int auxPosY = (int) (Math.random() * (600 - 400) + 400);
                     ((tubeUp) listUp.get(i)).setPosY(auxPosY);
                     ((tubeDown) listDown.get(i)).setPosY(auxPosY - gap - ((tubeUp) listUp.get(i)).getAlto());
 
-                    auxX += getWidth()/2;
+                    auxX += getWidth() / 2;
                     auxScore = true;
                 }
             }
@@ -316,15 +327,31 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * @param g es el <code>objeto grafico</code> usado para dibujar.
      */
     public void paint1(Graphics g) {
-        g.drawImage(fondo, 0, 0, this);
-        g.drawImage(pika.getImagenI(), pika.getPosX(), pika.getPosY(), this);
-        for (int i = 0; i < numTubos; i++) {
-            g.drawImage(((tubeDown) listDown.get(i)).getImagenI(), ((tubeDown) listDown.get(i)).getPosX(), ((tubeDown) listDown.get(i)).getPosY(), this);
-            g.drawImage(((tubeUp) listUp.get(i)).getImagenI(), ((tubeUp) listUp.get(i)).getPosX(), ((tubeUp) listUp.get(i)).getPosY(), this);
+        if (Menu) {
+            g.drawImage(pantallaInicio, 0, 0, this);
+        } else if (Creditos) {
+            g.drawImage(pantallaCreditos, 0, 0, this);
+            g.drawImage(botonBack.getImagenI(), botonBack.getPosX(), botonBack.getPosY(), this);
+        } else if (Instrucciones) {
+            g.drawImage(pantallaInstrucciones, 0, 0, this);
+        } else if (gameOver) {
+            g.drawImage(pantallaGameOver, 0, 0, this);
+            g.drawImage(botonSco, botonCre.getPosX(), 300, this);
+            g.drawString("" + score, botonCre.getPosX() + 200, 330);
+            g.drawString("Falta", botonCre.getPosX() + 200, 380);
+            g.drawImage(botonCre.getImagenI(), botonCre.getPosX(), botonCre.getPosY(), this);
+        } else if (juegoInicia) {
+            g.drawImage(fondo, 0, 0, this);
+            g.drawImage(pika.getImagenI(), pika.getPosX(), pika.getPosY(), this);
+            for (int i = 0; i < numTubos; i++) {
+                g.drawImage(((tubeDown) listDown.get(i)).getImagenI(), ((tubeDown) listDown.get(i)).getPosX(), ((tubeDown) listDown.get(i)).getPosY(), this);
+                g.drawImage(((tubeUp) listUp.get(i)).getImagenI(), ((tubeUp) listUp.get(i)).getPosX(), ((tubeUp) listUp.get(i)).getPosY(), this);
+            }
+            g.drawString("Score: " + score, getWidth() - 100, 40);
+            if (pausa) {
+                g.drawString("PAUSA", pika.getPosX() + 10, pika.getPosY() - 5);
+            }
         }
-        // g.drawImage(tubo1.getImagenI(), tubo1.getPosX(), tubo1.getPosY(), this);
-        // g.drawImage(tubo2.getImagenI(), tubo2.getPosX(), tubo2.getPosY(), this);
-        g.drawString("Score: " + score, getWidth() / 2 - 30, 40);
     }
 
     /**
@@ -356,8 +383,21 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             sonido = !sonido;
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_M) { //Presiono tecla M
-            musica = !musica;
+        if (e.getKeyCode() == KeyEvent.VK_I) { //Presiono tecla I
+            if (Menu) {
+                Menu = false;
+                Instrucciones = !Instrucciones;
+            } else if (Instrucciones) {
+                Instrucciones = !Instrucciones;
+                Menu = true;
+            }
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_N && (Menu || gameOver)) { //tecleo N
+            juegoInicia = true;
+            Menu = false;
+            gameOver = false;
+            reset();
         }
 
         if (e.getKeyCode() == KeyEvent.VK_SPACE) { //Presiono tecla M
@@ -374,7 +414,6 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * @param e es el <code>evento</code> que se genera en al soltar las teclas.
      */
     public void keyReleased(KeyEvent e) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 
     }
 
@@ -384,49 +423,16 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * algun componente. e es el evento generado al hacer click con el mouse.
      */
     public void mouseClicked(MouseEvent e) {
-        /*  clickX = e.getX();
-         clickY = e.getY();
-
-         //checa clicks en botones
-         if (botonInst.clickEnPersonaje(clickX, clickY)) {
-         if (!juegoInicia) {
-         Menu = false;
-         Instrucciones = true;
-         }
-         }
-         if (botonIni.clickEnPersonaje(clickX, clickY)) {
-         pausa = false;
-         Menu = false;
-         juegoInicia = true;
-         }
-         if (botonAj.clickEnPersonaje(clickX, clickY)) {
-         if (!juegoInicia) {
-         Menu = false;
-         Ajustes = true;
-         }
-         }
-         if (botonCre.clickEnPersonaje(clickX, clickY)) {
-         if (!juegoInicia) {
-         Menu = false;
-         Creditos = true;
-         }
-         }
-         if (botonBack.clickEnPersonaje(clickX, clickY)) {
-         if (vidas==0 || gano) 
-         {
-         vidas=1;
-         gano = false;
-         reset();
-         }
-         Menu = true;
-         Instrucciones = false;
-         Ajustes = false;
-         Creditos = false;
-         juegoInicia=false;
-            
-            
-         }
-         */
+        clickX = e.getX();
+        clickY = e.getY();
+        if (botonCre.clickEnPersonaje(clickX, clickY)) {
+            Creditos = true;
+            gameOver=false;
+        }
+        if (botonBack.clickEnPersonaje(clickX, clickY)) {
+            Creditos = false;
+            gameOver = true;
+        }
     }
 
     /**
