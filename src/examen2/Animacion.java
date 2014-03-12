@@ -3,15 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package examen2;
-
 
 /**
  *
  * @author Angela Romo , Cesar Rodriguez
  */
-
 import java.awt.Image;
 import java.util.ArrayList;
 
@@ -76,37 +73,64 @@ public class Animacion {
         }
     }
 
+    /**
+     * Cuadro De Animacion
+     *
+     * @param i
+     * @return cuadro
+     */
     private cuadroDeAnimacion getCuadro(int i) {
         return (cuadroDeAnimacion) cuadros.get(i);
     }
 
+    /**
+     * Cuadro de animacion
+     */
     public class cuadroDeAnimacion {
 
         Image imagen;
         long tiempoFinal;
 
+        /**
+         * Cuadro de animacion
+         */
         public cuadroDeAnimacion() {
             this.imagen = null;
             this.tiempoFinal = 0;
         }
 
+        /**
+         * Cuadro de animacion
+         */
         public cuadroDeAnimacion(Image imagen, long tiempoFinal) {
             this.imagen = imagen;
             this.tiempoFinal = tiempoFinal;
         }
 
+        /**
+         * get Imagen regresa la imagen del objeto
+         */
         public Image getImagen() {
             return imagen;
         }
 
+        /**
+         * regresa tiempo final
+         */
         public long getTiempoFinal() {
             return tiempoFinal;
         }
 
+        /**
+         * colocar imagen
+         */
         public void setImagen(Image imagen) {
             this.imagen = imagen;
         }
 
+        /**
+         * colocar tiempo final
+         */
         public void setTiempoFinal(long tiempoFinal) {
             this.tiempoFinal = tiempoFinal;
         }

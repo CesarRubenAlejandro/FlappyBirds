@@ -78,12 +78,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     private boolean auxScore;
     private int gap;
     private int numTubos;
-
     private int contador;
     private boolean auxDif1;
     private boolean auxDif2;
     private int nivel2;
-    
+    //best score
     private String nombreArchivo;    //Nombre del archivo.
     private int scoreMayor;
 
@@ -166,6 +165,9 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         th.start();
     }
 
+    /**
+     * Metodo para resetear los valores Cuando se pide volver a jugar
+     */
     public void reset() {
         juegoInicia = true;
         //booleanos para control de pantallas
@@ -195,10 +197,10 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
 
             auxPosX += getWidth() / 2;
         }
-        
+
         nivel2 = 0;
         auxDif2 = true;
-      
+        //Iniciar thread nuevo si es el segundo juego o despues
         if (contador > 1) {
             Thread th = new Thread(this);
             // Empieza el hilo
@@ -226,7 +228,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             if (!pausa && juegoInicia) {
                 try {
                     actualiza();
-                }   catch (IOException e) {
+                } catch (IOException e) {
                     System.out.println("Error en " + e.toString());
                 }
                 checaColision();
@@ -248,24 +250,24 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * las variables.
      */
     public void actualiza() throws IOException {
-        
+        //Musica de fondo si se desea
         if (!sonido) {
             musicaFondo.stop();
         }
-        
+        //Niveles de Dificultad
         if (score == 10 && auxDif1) {
             gap = gap - 80;
             auxDif1 = false;
         }
-        
-        if (score == 20 && auxDif2){
+        //Niveles de Dificultad
+        if (score == 20 && auxDif2) {
             auxDif2 = false;
             nivel2 = 100;
         }
-
+        //Niveles de Dificultad
         if (pegaAbajo) {
             vidas--;
-            if(sonido){
+            if (sonido) {
                 choca.play();
             }
             juegoInicia = false;
@@ -285,11 +287,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         if (vuela) {
             tiempo = 0;
             pika.setVelocidad(8);
-            if(sonido){
+            if (sonido) {
                 tap.play();
             }
         }
-        
+
         // Movimiento de caida libre
         int aux = (pika.getVelocidad() * tiempo) - (grav * tiempo * tiempo) / 2;
         pika.setPosY(pika.getPosY() - aux);
@@ -300,7 +302,8 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             ((tubeDown) listDown.get(i)).setPosX(((tubeDown) listDown.get(i)).getPosX() - 10);
             if ((pika.getPosX() > ((tubeUp) listUp.get(i)).getPosX() + ((tubeUp) listUp.get(i)).getAncho()) && (auxScore)) {
                 score++;
-                if(sonido){
+                //Sonido si se desea
+                if (sonido) {
                     punto.play();
                 }
                 auxScore = false;
@@ -311,20 +314,19 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
 
         //checa vidas
         if (vidas == 0) {
-            
-            BufferedReader fileIn = new BufferedReader(new FileReader(nombreArchivo));   
+            //guarda mejor score al finalizar el juego
+            BufferedReader fileIn = new BufferedReader(new FileReader(nombreArchivo));
             int compara = Integer.parseInt(fileIn.readLine());
             fileIn.close();
-            if (compara<score){
+            if (compara < score) {
                 PrintWriter fileOut = new PrintWriter(new FileWriter(nombreArchivo));
                 fileOut.println(score);
                 fileOut.close();
                 scoreMayor = score;
-            }       
-            else {
+            } else {
                 scoreMayor = compara;
             }
-            
+
             gameOver = true; //prende bool para PANTALLA de gameover
         }
     }
@@ -409,19 +411,24 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      */
     public void paint1(Graphics g) {
         if (Menu) {
+            //Pintar menu
             g.drawImage(pantallaInicio, 0, 0, this);
         } else if (Creditos) {
+            //Pantalla de creditos y boton back
             g.drawImage(pantallaCreditos, 0, 0, this);
             g.drawImage(botonBack.getImagenI(), botonBack.getPosX(), botonBack.getPosY(), this);
         } else if (Instrucciones) {
+            //Pintar instrucciones
             g.drawImage(pantallaInstrucciones, 0, 0, this);
         } else if (gameOver) {
+            //Pintar game over, score y boton creditos
             g.drawImage(pantallaGameOver, 0, 0, this);
             g.drawImage(botonSco, botonCre.getPosX(), 300, this);
             g.drawString("" + score, botonCre.getPosX() + 200, 330);
-            g.drawString( ""+scoreMayor, botonCre.getPosX() + 200, 380);
+            g.drawString("" + scoreMayor, botonCre.getPosX() + 200, 380);
             g.drawImage(botonCre.getImagenI(), botonCre.getPosX(), botonCre.getPosY(), this);
         } else if (juegoInicia) {
+            //Pintar juego
             g.drawImage(fondo, 0, 0, this);
             g.drawImage(pika.getImagenI(), pika.getPosX(), pika.getPosY(), this);
             for (int i = 0; i < numTubos; i++) {
@@ -430,6 +437,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             }
             g.drawString("Score: " + score, getWidth() - 100, 40);
             if (pausa) {
+                //Indicar pausa
                 g.drawString("PAUSA", pika.getPosX() + 10, pika.getPosY() - 5);
             }
         }
@@ -462,7 +470,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
 
         if (e.getKeyCode() == KeyEvent.VK_S) { //Presiono tecla S
             sonido = !sonido;
-            if (sonido){
+            if (sonido) {
                 //Reproduce el clip
                 musicaFondo.play();
             }

@@ -7,7 +7,7 @@ package examen2;
 
 /**
  *
- * @author Aaron
+ * @author Angela Romo, Cesar Rodriguez
  */
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -15,6 +15,7 @@ import java.net.URL;
 
 public class tubeDown extends Base {
 
+    //constructor
     public tubeDown(int posX, int posY) {
         super(posX, posY);
 

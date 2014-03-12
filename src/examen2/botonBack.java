@@ -16,7 +16,7 @@ import java.awt.Toolkit;
 import java.net.URL;
 
 public class botonBack extends Base{
-    
+    //Constructor
      public botonBack(int posX, int posY) {
         super(posX, posY);
 

@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package examen2;
 
 /**
@@ -26,6 +25,7 @@ public class SoundClip {
     private int repeat = 0;
     private String filename = "";
 
+    //Constructor
     public SoundClip() {
 
         try {
@@ -203,4 +203,3 @@ public class SoundClip {
         clip.stop();
     }
 }
-

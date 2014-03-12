@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package examen2;
 
 /**
@@ -16,6 +15,7 @@ import java.net.URL;
 
 public class tubeUp extends Base {
 
+    //Constructor
     public tubeUp(int posX, int posY) {
         super(posX, posY);
 

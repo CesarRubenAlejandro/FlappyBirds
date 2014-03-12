@@ -3,25 +3,29 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package examen2;
 
 /**
  *
- * @author Aaron
+ * @author Angela Romo, Cesar Rodriguez
  */
-
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.net.URL;
 
 public class Pikachu extends Base {
-    
-    private int velocidad;
-    
+
+    private int velocidad; //variable velocidad
+
+    /**
+     * Constructor
+     *
+     * @param posX posicion en X
+     * @param posY posicion en Y
+     */
     public Pikachu(int posX, int posY) {
         super(posX, posY);
-
+        //imagenes a animar
         URL bURL = this.getClass().getResource("ImagenesPikachu/frame_000.gif");
         Image pic0 = Toolkit.getDefaultToolkit().getImage(bURL);
 
@@ -33,16 +37,16 @@ public class Pikachu extends Base {
 
         URL b3URL = this.getClass().getResource("ImagenesPikachu/frame_003.gif");
         Image pic3 = Toolkit.getDefaultToolkit().getImage(b3URL);
-        
+
         URL b4URL = this.getClass().getResource("ImagenesPikachu/frame_004.gif");
         Image pic4 = Toolkit.getDefaultToolkit().getImage(b4URL);
-        
+
         URL b5URL = this.getClass().getResource("ImagenesPikachu/frame_005.gif");
         Image pic5 = Toolkit.getDefaultToolkit().getImage(b5URL);
-        
+
         URL b6URL = this.getClass().getResource("ImagenesPikachu/frame_006.gif");
         Image pic6 = Toolkit.getDefaultToolkit().getImage(b6URL);
-        
+
         URL b7URL = this.getClass().getResource("ImagenesPikachu/frame_007.gif");
         Image pic7 = Toolkit.getDefaultToolkit().getImage(b7URL);
 
@@ -58,12 +62,22 @@ public class Pikachu extends Base {
 
         velocidad = 0;
     }
-    
-    public void setVelocidad (int x){
+
+    /**
+     * Establecer variable velocidad (integer)
+     *
+     * @param x velocidad
+     */
+    public void setVelocidad(int x) {
         velocidad = x;
     }
-    
-    public int getVelocidad () {
+
+    /**
+     * Regresa valor de velocidad
+     *
+     * @return velocidad
+     */
+    public int getVelocidad() {
         return velocidad;
     }
 }

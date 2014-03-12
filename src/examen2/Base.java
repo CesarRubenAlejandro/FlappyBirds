@@ -3,18 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package examen2;
 
 /**
  *
- * @author Aaron
+ * @author Angela Romo, Cesar Rodriguez
  */
 import javax.swing.ImageIcon;
 import java.awt.Image;
 import java.awt.Rectangle;
 
-    public class Base {
+public class Base {
+
     private int posX;    //posicion en x.       
     private int posY;	//posicion en y.
     protected Animacion anima; // animacion del objeto
@@ -67,8 +67,6 @@ import java.awt.Rectangle;
         return posY;
     }
 
-     
-
     /**
      * Metodo de acceso que regresa el ancho del icono
      *
@@ -77,7 +75,7 @@ import java.awt.Rectangle;
      */
     public int getAncho() {
         //return icono.getIconWidth();
-        return (  new ImageIcon(anima.getImagen() ) ).getIconWidth();
+        return (new ImageIcon(anima.getImagen())).getIconWidth();
     }
 
     /**
@@ -88,7 +86,7 @@ import java.awt.Rectangle;
      */
     public int getAlto() {
         //return icono.getIconHeight();
-        return (  new ImageIcon(anima.getImagen() ) ).getIconHeight();
+        return (new ImageIcon(anima.getImagen())).getIconHeight();
     }
 
     /**
@@ -110,11 +108,10 @@ import java.awt.Rectangle;
     public Rectangle getPerimetro() {
         return new Rectangle((int) getPosX(), (int) getPosY(), getAncho(), getAlto());
     }
-    
 
     /**
      * Metodo intersecta
-     * 
+     *
      * Checa si el objeto <code>Animal</code> intersecta a otro
      * <code>Animal</code>
      *
@@ -124,22 +121,23 @@ import java.awt.Rectangle;
     public boolean intersecta(Base obj) {
         return getPerimetro().intersects(obj.getPerimetro());
     }
-    
-     /**
+
+    /**
      * @param tiempo es el <code> tiempo transcurrido</code> en el applet
-     * 
+     *
      * Actualiza el tiempo actual <code> long </code> del atributo anima 
-     * <code> Animacion </code> 
+     * <code> Animacion </code>
      */
-    public void actualiza (long tiempo) {
+    public void actualiza(long tiempo) {
         anima.actualiza(tiempo);
     }
-    
+
     /**
-     * 
+     *
      * @param clickX coordenadas en x del click
      * @param clickY coordenadas en y del click
-     * @return <code> booleano </code> que indica si el click estuvo adentro del personaje o no
+     * @return <code> booleano </code> que indica si el click estuvo adentro del
+     * personaje o no
      */
     public boolean clickEnPersonaje(int clickX, int clickY) {
 
