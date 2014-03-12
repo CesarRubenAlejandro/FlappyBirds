@@ -16,6 +16,9 @@ import java.awt.event.MouseListener;
 import java.awt.Toolkit;
 import java.awt.Color;
 import java.util.LinkedList;
+import java.io.*;
+import java.util.*;
+import static java.lang.System.out;
 
 /**
  *
@@ -73,6 +76,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     private int gap;
     private int numTubos;
 
+    private int contador;
+    private boolean auxDif1;
+    private boolean auxDif2;
+    private int nivel2;
+
     public Examen2() {
         setTitle("JFrame Fly A Chu");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -84,6 +92,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         sonido = true;
         addMouseListener(this);
         addKeyListener(this);
+        contador = 0;
         c = new Color(255, 255, 255); //para el string de vidas 
         //crea lista para barreras
         listUp = new LinkedList();
@@ -106,7 +115,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         gameOver = false;
         juegoInicia = false;
         back = false;
-        gameOver =false;
+        gameOver = false;
         //clicks
         clickX = 0;
         clickY = 0;
@@ -131,7 +140,9 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             auxPosX += getWidth() / 2;
         }
         auxScore = true;
-
+        auxDif1 = true;
+        auxDif2 = true;
+        nivel2 = 0;
         //HILO
         Thread th = new Thread(this);
         // Empieza el hilo
@@ -141,17 +152,20 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     public void reset() {
         juegoInicia = true;
         //booleanos para control de pantallas
-        Menu=false;
+        Menu = false;
         Creditos = false;
         Instrucciones = false;
         gameOver = false;
         back = false;
-        gameOver =false;
+        gameOver = false;
         //variables
         vidas = 1;
         tiempo = 0;
         score = 0;
         vuela = false;
+        pegaAbajo = false;
+        auxDif1 = true;
+        gap = getHeight() / 3;
         pika.setPosY(getHeight() / 4);
         pika.setPosX(getWidth() / 4);
         int auxPosX = 0;
@@ -164,7 +178,16 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
 
             auxPosX += getWidth() / 2;
         }
-   
+        
+        nivel2 = 0;
+        auxDif2 = true;
+      
+        if (contador > 1) {
+            Thread th = new Thread(this);
+            // Empieza el hilo
+            th.start();
+        }
+
     }
 
     /**
@@ -204,13 +227,22 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * las variables.
      */
     public void actualiza() {
+        if (score == 10 && auxDif1) {
+            gap = gap - 80;
+            auxDif1 = false;
+        }
+        
+        if (score == 20 && auxDif2){
+            auxDif2 = false;
+            nivel2 = 100;
+        }
 
         if (pegaAbajo) {
             vidas--;
             juegoInicia = false;
             pegaAbajo = false;
         }
-        
+
         //Determina el tiempo que ha transcurrido desde que el Applet inicio su ejecuciÃ³n
         long tiempoTranscurrido = System.currentTimeMillis() - tiempoActual;
         //Guarda el tiempo actual
@@ -241,9 +273,9 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         }
         //reinicia bools
         vuela = false;
-        
+
         //checa vidas
-        if(vidas==0){
+        if (vidas == 0) {
             gameOver = true; //prende bool para PANTALLA de gameover
         }
     }
@@ -267,7 +299,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             if ((pika.intersecta(((tubeDown) listDown.get(i)))) || (pika.intersecta(((tubeUp) listUp.get(i))))) {
                 pegaAbajo = true;
             }
-            int auxX = getWidth() / 2;
+            int auxX = getWidth() / 2 - nivel2;
             tubeDown tub = (tubeDown) listDown.get(i);
             if (tub.getPosX() + tub.getAncho() < 0) {
                 if (i == 0) {
@@ -397,6 +429,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             juegoInicia = true;
             Menu = false;
             gameOver = false;
+            contador++;
             reset();
         }
 
@@ -427,7 +460,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         clickY = e.getY();
         if (botonCre.clickEnPersonaje(clickX, clickY)) {
             Creditos = true;
-            gameOver=false;
+            gameOver = false;
         }
         if (botonBack.clickEnPersonaje(clickX, clickY)) {
             Creditos = false;
