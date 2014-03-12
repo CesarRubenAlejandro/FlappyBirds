@@ -85,6 +85,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     //best score
     private String nombreArchivo;    //Nombre del archivo.
     private int scoreMayor;
+    // Variables para el rango en y de los tubos
+    private int rangoMayor;
+    private int rangoMenor;
+    // Archivo de puntajes altos
+    private boolean puntajes;
 
     public Examen2() {
         setTitle("JFrame Fly A Chu");
@@ -136,16 +141,19 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         clickY = 0;
         //variables para control del juego
         vuela = false;
-        pika = new Pikachu(getWidth() / 4, getHeight() / 4);
+        pika = new Pikachu(getWidth() / 2, getHeight() / 2);
         tiempo = 0;
         grav = 2;
         pegaAbajo = false;
-        gap = getHeight() / 3;
+        gap = getHeight() / 4;
         numTubos = 3;
         //crear lista de obstaculos
         int auxPosX = 0;
+        rangoMayor = 200;
+        rangoMenor = 100;
         for (int i = 0; i < numTubos; i++) {
-            int auxPosY = (int) (Math.random() * (600 - 400) + 400);
+            //int auxPosY = (int) (Math.random() * (600 - 400) + 400);
+            int auxPosY = (int) (Math.random() * (rangoMayor - rangoMenor) + rangoMenor);
             tubo2 = new tubeUp(getWidth() + 20 + auxPosX, auxPosY);
             tubo1 = new tubeDown(getWidth() + 20 + auxPosX, -100);
             tubo1.setPosY(auxPosY - gap - tubo1.getAlto());
@@ -159,6 +167,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         auxDif2 = true;
         nivel2 = 0;
         nombreArchivo = "Datos.txt";
+        puntajes = false;
         //HILO
         Thread th = new Thread(this);
         // Empieza el hilo
@@ -177,19 +186,22 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         gameOver = false;
         back = false;
         gameOver = false;
+        pausa = false;
         //variables
         vidas = 1;
         tiempo = 0;
         score = 0;
         vuela = false;
         pegaAbajo = false;
-        auxDif1 = true;
-        gap = getHeight() / 3;
-        pika.setPosY(getHeight() / 4);
-        pika.setPosX(getWidth() / 4);
+        gap = getHeight() / 4;
+        pika.setPosY(getHeight() / 2);
+        pika.setPosX(getWidth() / 2);
         int auxPosX = 0;
+        rangoMayor = 500;
+        rangoMenor = 480;
         for (int i = 0; i < numTubos; i++) {
-            int auxPosY = (int) (Math.random() * (600 - 400) + 400);
+
+            int auxPosY = (int) (Math.random() * (rangoMayor - rangoMenor) + rangoMenor);
             ((tubeDown) listDown.get(i)).setPosX(getWidth() + 20 + auxPosX);
             ((tubeUp) listUp.get(i)).setPosX(getWidth() + 20 + auxPosX);
             ((tubeUp) listUp.get(i)).setPosY(auxPosY);
@@ -200,6 +212,8 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
 
         nivel2 = 0;
         auxDif2 = true;
+        auxScore = true;
+        puntajes = false;
         //Iniciar thread nuevo si es el segundo juego o despues
         if (contador > 1) {
             Thread th = new Thread(this);
@@ -255,16 +269,14 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             musicaFondo.stop();
         }
         //Niveles de Dificultad
-        if (score == 10 && auxDif1) {
-            gap = gap - 80;
-            auxDif1 = false;
+        if (score % 10 == 0 && auxDif2) { // Se hace residuo con 10 para que la dificultad aumente a partir del tubo #10
+            // if (nivel2<getWidth()/2 && rangoMayor < 600 && rangoMenor > 400)
+            nivel2 += 65;
+            rangoMayor += 20;
+            rangoMenor -= 20;
         }
-        //Niveles de Dificultad
-        if (score == 20 && auxDif2) {
-            auxDif2 = false;
-            nivel2 = 100;
-        }
-        //Niveles de Dificultad
+        auxDif2 = false;
+
         if (pegaAbajo) {
             vidas--;
             if (sonido) {
@@ -302,6 +314,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             ((tubeDown) listDown.get(i)).setPosX(((tubeDown) listDown.get(i)).getPosX() - 10);
             if ((pika.getPosX() > ((tubeUp) listUp.get(i)).getPosX() + ((tubeUp) listUp.get(i)).getAncho()) && (auxScore)) {
                 score++;
+                auxDif2 = true; // Permite que se aumente el nivel solo una vez 
                 //Sonido si se desea
                 if (sonido) {
                     punto.play();
@@ -338,6 +351,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      */
     public void checaColision() {
 
+        // Si el pikachu llega hasta el limite superior del jframe
+        if (pika.getPosY() < 0) {
+            pegaAbajo = true;
+        }
+
         //Si el pikachu golpea abajo del jframe
         if (pika.getPosY() > getWidth()) {
             pegaAbajo = true;
@@ -353,26 +371,33 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             int auxX = getWidth() / 2 - nivel2;
             tubeDown tub = (tubeDown) listDown.get(i);
             if (tub.getPosX() + tub.getAncho() < 0) {
-                if (i == 0) {
-                    ((tubeDown) listDown.get(i)).setPosX(getWidth() + auxX);
-                    ((tubeUp) listUp.get(i)).setPosX(getWidth() + auxX);
-                    int auxPosY = (int) (Math.random() * (600 - 400) + 400);
-                    ((tubeUp) listUp.get(i)).setPosY(auxPosY);
-                    ((tubeDown) listDown.get(i)).setPosY(auxPosY - gap - ((tubeUp) listUp.get(i)).getAlto());
 
-                    auxX += getWidth() / 2;
-                    auxScore = true;
-                } else {
-                    ((tubeDown) listDown.get(i)).setPosX(getWidth() + 20 + auxX);
-                    ((tubeUp) listUp.get(i)).setPosX(getWidth() + 20 + auxX);
-                    int auxPosY = (int) (Math.random() * (600 - 400) + 400);
-                    ((tubeUp) listUp.get(i)).setPosY(auxPosY);
-                    ((tubeDown) listDown.get(i)).setPosY(auxPosY - gap - ((tubeUp) listUp.get(i)).getAlto());
+                ((tubeDown) listDown.get(i)).setPosX(getWidth() + 20 + auxX);
+                ((tubeUp) listUp.get(i)).setPosX(getWidth() + 20 + auxX);
+                int auxPosY = (int) (Math.random() * (rangoMayor - rangoMenor) + rangoMenor);
+                ((tubeUp) listUp.get(i)).setPosY(auxPosY);
+                ((tubeDown) listDown.get(i)).setPosY(auxPosY - gap - ((tubeUp) listUp.get(i)).getAlto());
 
-                    auxX += getWidth() / 2;
-                    auxScore = true;
-                }
+                auxX += getWidth() / 2;
+                auxScore = true;
+
             }
+        }
+    }
+    /**
+     * Despliega la tabla de high scores, llamado por el paint1
+     * @param g para pintar a pantalla
+     * @throws IOException 
+     */
+    public void despliega(Graphics g) throws IOException { // Despliega score
+        int y = getHeight() / 4;
+        BufferedReader fileIn = new BufferedReader(new FileReader("puntaje.txt"));
+        String linea = fileIn.readLine();
+        g.setColor(c);
+        while (linea != null) {
+            g.drawString(linea, 100, y);
+            linea = fileIn.readLine();
+            y += 50;
         }
     }
 
@@ -410,6 +435,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * @param g es el <code>objeto grafico</code> usado para dibujar.
      */
     public void paint1(Graphics g) {
+
         if (Menu) {
             //Pintar menu
             g.drawImage(pantallaInicio, 0, 0, this);
@@ -440,6 +466,18 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
                 //Indicar pausa
                 g.drawString("PAUSA", pika.getPosX() + 10, pika.getPosY() - 5);
             }
+        }
+        if (puntajes) {
+            g.drawImage(fondo, 0, 0, this);
+            g.setColor(c);
+            g.drawString("HIGH SCORES", getWidth() / 2 - 100, getHeight() / 4 - 100);
+            try {
+                despliega(g);
+            } catch (IOException e) {
+                System.out.println("Error en " + e.toString());
+
+            }
+
         }
     }
 
@@ -495,7 +533,21 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         }
 
         if (e.getKeyCode() == KeyEvent.VK_SPACE) { //Presiono tecla espacio
-            vuela = true;
+            if (juegoInicia) {
+                vuela = true;
+            }
+            if (gameOver || Menu) {
+                juegoInicia = true;
+                Menu = false;
+                gameOver = false;
+                contador++;
+                reset();
+            }
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_F) {
+            puntajes = !puntajes;
+            pausa = true;
         }
     }
 
@@ -526,6 +578,10 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         if (botonBack.clickEnPersonaje(clickX, clickY)) {
             Creditos = false;
             gameOver = true;
+        }
+
+        if (juegoInicia) {
+            vuela = true;
         }
     }
 
