@@ -125,6 +125,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     public void reset(){
         vidas = 1;
         tiempo = 0;
+        score = 0;
         vuela = false;
         pika.setPosY(getHeight()/4);
         pika.setPosX(getWidth()/4);
@@ -216,6 +217,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         
         //Si el pikachu golpea abajo del jframe
         if (pika.getPosY()>getWidth()){
+            pegaAbajo = true;
+        }
+        
+        //Si el pikachu golpea con cualquier tubo
+        if ((pika.intersecta(tubo1))|| (pika.intersecta(tubo2))){
             pegaAbajo = true;
         }
         
