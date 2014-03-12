@@ -67,6 +67,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     private tubeDown tubo1;
     private tubeUp tubo2;
     private boolean auxScore;
+    private int gap;
 
     
     public Examen2() {
@@ -105,9 +106,14 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         tiempo = 0;
         grav = 2;
         pegaAbajo = false;
+        gap = getHeight()/3;
         
-        tubo1 = new tubeDown (getWidth(), -700);
-        tubo2 = new tubeUp (getWidth(), 450); 
+        int auxPosY = (int) (Math.random() * (600 - 400) + 400);
+        tubo2 = new tubeUp (getWidth()+20, auxPosY); 
+        tubo1 = new tubeDown (getWidth()+20, -100);
+        tubo1.setPosY(auxPosY-gap - tubo1.getAlto());
+        
+        
         auxScore = true;
         
         //HILO
@@ -122,6 +128,8 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         vuela = false;
         pika.setPosY(getHeight()/4);
         pika.setPosX(getWidth()/4);
+        tubo1.setPosX(getWidth()+50);
+        tubo2.setPosX(getWidth()+50);
     }
     
     /**
@@ -216,6 +224,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         if (tubo1.getPosX()+tubo1.getAncho()<0){
             tubo1.setPosX(getWidth()+20);
             tubo2.setPosX(getWidth()+20);
+            
+            int auxPosY = (int) (Math.random() * (600 - 400) + 400);
+            tubo2.setPosY(auxPosY);
+            tubo1.setPosY(auxPosY-gap - tubo1.getAlto());
+            
             auxScore = true;
         }
     }
