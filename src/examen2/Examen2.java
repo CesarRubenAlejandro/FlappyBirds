@@ -64,6 +64,9 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     private int tiempo;
     private int grav;
     private boolean pegaAbajo;
+    private tubeDown tubo1;
+    private tubeUp tubo2;
+    private boolean auxScore;
 
     
     public Examen2() {
@@ -82,7 +85,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         //crea lista para barreras
         //list = new LinkedList();
         //Imagenes
-        fondo = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("fondo/fondo2soft.jpg"));
+        fondo = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/Slide1.jpg"));
        // pantallaInstrucciones = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaInstrucciones.jpg"));
      //   pantallaPausa = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaPausa.jpg"));
       //  pantallaCreditos = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("Pantallas/pantallaCreditos.jpg"));
@@ -102,6 +105,10 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         tiempo = 0;
         grav = 2;
         pegaAbajo = false;
+        
+        tubo1 = new tubeDown (getWidth(), -700);
+        tubo2 = new tubeUp (getWidth(), 450); 
+        auxScore = true;
         
         //HILO
         Thread th = new Thread(this);
@@ -174,9 +181,18 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             pika.setVelocidad(8);
         }
         
-        // 
+        // Movimiento de caida libre
         int aux = (pika.getVelocidad()*tiempo) - (grav*tiempo*tiempo)/2;
         pika.setPosY(  pika.getPosY() - aux );
+        
+        if ((pika.getPosX()> tubo1.getPosX()+tubo1.getAncho())&&(auxScore)){
+            score++;
+            auxScore = false;
+        }
+        
+        // Movimiento de las tuberias
+        tubo1.setPosX(tubo1.getPosX()- 10);
+        tubo2.setPosX(tubo2.getPosX()- 10);
         
         //reinicia bools
         vuela = false;
@@ -189,8 +205,18 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * entre sí y con las orillas del <code>JFrame</code>.
      */
     public void checaColision() {
+        
+        //Si el pikachu golpea abajo del jframe
         if (pika.getPosY()>getWidth()){
             pegaAbajo = true;
+        }
+        
+        //Checa colision de los tubos con la pared izquierda
+        // Cuando llegan a la pared, reiniciarlos y reiniciar el auxScore
+        if (tubo1.getPosX()+tubo1.getAncho()<0){
+            tubo1.setPosX(getWidth()+20);
+            tubo2.setPosX(getWidth()+20);
+            auxScore = true;
         }
     }
     
@@ -230,7 +256,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * @param g es el <code>objeto grafico</code> usado para dibujar.
      */
     public void paint1(Graphics g) {
+        g.drawImage(fondo, 0,0,this);
         g.drawImage(pika.getImagenI(), pika.getPosX(), pika.getPosY(), this);
+        g.drawImage(tubo1.getImagenI(), tubo1.getPosX(), tubo1.getPosY(), this);
+        g.drawImage(tubo2.getImagenI(), tubo2.getPosX(), tubo2.getPosY(), this);
+        g.drawString ("Score: " + score , getWidth()/2 - 30, 40);
     }
     
    /**
