@@ -16,9 +16,11 @@ import java.awt.event.MouseListener;
 import java.awt.Toolkit;
 import java.awt.Color;
 import java.util.LinkedList;
-import java.io.*;
-import java.util.*;
-import static java.lang.System.out;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.PrintWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  *
@@ -80,6 +82,9 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
     private boolean auxDif1;
     private boolean auxDif2;
     private int nivel2;
+    
+    private String nombreArchivo;    //Nombre del archivo.
+    private int scoreMayor;
 
     public Examen2() {
         setTitle("JFrame Fly A Chu");
@@ -143,6 +148,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         auxDif1 = true;
         auxDif2 = true;
         nivel2 = 0;
+        nombreArchivo = "Datos.txt";
         //HILO
         Thread th = new Thread(this);
         // Empieza el hilo
@@ -207,7 +213,11 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
 
             //si esta pausado no actualizas ni checas colision 
             if (!pausa && juegoInicia) {
-                actualiza();
+                try {
+                    actualiza();
+                }   catch (IOException e) {
+                    System.out.println("Error en " + e.toString());
+                }
                 checaColision();
             }
             repaint(); // Se actualiza el <code>JFrame</code> repintando el contenido.
@@ -226,7 +236,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
      * Es usado para actualizar la posicion de los personajes y los valores de
      * las variables.
      */
-    public void actualiza() {
+    public void actualiza() throws IOException {
         if (score == 10 && auxDif1) {
             gap = gap - 80;
             auxDif1 = false;
@@ -276,6 +286,20 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
 
         //checa vidas
         if (vidas == 0) {
+            
+            BufferedReader fileIn = new BufferedReader(new FileReader(nombreArchivo));   
+            int compara = Integer.parseInt(fileIn.readLine());
+            fileIn.close();
+            if (compara<score){
+                PrintWriter fileOut = new PrintWriter(new FileWriter(nombreArchivo));
+                fileOut.println(score);
+                fileOut.close();
+                scoreMayor = score;
+            }       
+            else {
+                scoreMayor = compara;
+            }
+            
             gameOver = true; //prende bool para PANTALLA de gameover
         }
     }
@@ -370,7 +394,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
             g.drawImage(pantallaGameOver, 0, 0, this);
             g.drawImage(botonSco, botonCre.getPosX(), 300, this);
             g.drawString("" + score, botonCre.getPosX() + 200, 330);
-            g.drawString("Falta", botonCre.getPosX() + 200, 380);
+            g.drawString( ""+scoreMayor, botonCre.getPosX() + 200, 380);
             g.drawImage(botonCre.getImagenI(), botonCre.getPosX(), botonCre.getPosY(), this);
         } else if (juegoInicia) {
             g.drawImage(fondo, 0, 0, this);
