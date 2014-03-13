@@ -21,6 +21,8 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
+
 
 /**
  *
@@ -328,6 +330,7 @@ public class Examen2 extends JFrame implements Runnable, KeyListener, MouseListe
         //checa vidas
         if (vidas == 0) {
             //guarda mejor score al finalizar el juego
+           // URL urlToDictionary = this.getClass().getResource("/" + "Datos.txt");
             BufferedReader fileIn = new BufferedReader(new FileReader(nombreArchivo));
             int compara = Integer.parseInt(fileIn.readLine());
             fileIn.close();
