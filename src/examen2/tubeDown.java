@@ -19,7 +19,7 @@ public class tubeDown extends Base {
     public tubeDown(int posX, int posY) {
         super(posX, posY);
 
-        URL bURL = this.getClass().getResource("Obstaculos/tubeDown.png");
+        URL bURL = this.getClass().getResource("Obstaculos/tubeDOWN.png");
         Image pic0 = Toolkit.getDefaultToolkit().getImage(bURL);
 
         anima = new Animacion();
